@@ -1,0 +1,57 @@
+TODO
+====
+I've listed a bunch of ID3 frames that weren't listed as part of the spec. I'm
+pretty sure we can ignore them but hey might as well list them here for
+completeness.
+
+
+General
+-------
+  - ID3 v2.x code can be deduplicated
+  - ID3 (un)synchronization handling
+  - Pictures!
+
+
+ID3 v1
+------
+  - Everything
+
+
+ID3 v2.2
+--------
+  - ID3v1 genres
+  - Length
+  - CM1 frame
+  - IPP frame
+  - PCS frame
+  - TCT frame
+  - TDR frame
+  - TID frame
+  - WFD frame
+
+
+ID3 v2.3 support
+--------
+  - ID3v1 genres
+  - NCON frame
+  - TCMP frame
+  - TDEN frame
+  - TDTG frame
+  - RGAD frame
+  - XSOP frame
+  - Merge with v2.4 code?
+
+
+ID3 v2.4
+--------
+  - ID3v1 genres
+  - TCMP frame
+  - Merge with v2.3 code?
+
+
+Unicode support
+---------------
+  - UTF-16BE needs to be tested
+  - Variable length UTF-16 strings are probably handled incorrectly
+  - UTF-16 w/o BOM needs to be tested
+  - expand() in id3.go is pretty silly due to how Go handles ISO/IEC 8859-1 characters
