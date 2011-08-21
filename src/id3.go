@@ -30,7 +30,7 @@ func init() {
 }
 
 type File struct {
-	Header *ID3v2Header
+	Header ID3v2Header
 
 	Name   string
 	Artist string
@@ -64,7 +64,7 @@ func Read(reader io.Reader) *File {
 		return nil
 	}
 
-	file.Header = parseID3v2Header(bufReader)
+	parseID3v2Header(file, bufReader)
 	limitReader := bufio.NewReader(io.LimitReader(bufReader, int64(file.Header.Size)))
 	var parser ID3Parser
 	if file.Header.Version == 2 {
@@ -92,18 +92,16 @@ func isID3Tag(reader *bufio.Reader) bool {
 	return data[0] == 'I' && data[1] == 'D' && data[2] == '3'
 }
 
-func parseID3v2Header(reader io.Reader) *ID3v2Header {
+func parseID3v2Header(file *File, reader io.Reader) {
 	data := make([]byte, 10)
 	reader.Read(data)
-	header := new(ID3v2Header)
-	header.Version = int(data[3])
-	header.MinorVersion = int(data[4])
-	header.Unsynchronization = data[5]&1<<7 != 0
-	header.Extended = data[5]&1<<6 != 0
-	header.Experimental = data[5]&1<<5 != 0
-	header.Footer = data[5]&1<<4 != 0
-	header.Size = parseSize(data[6:])
-	return header
+	file.Header.Version = int(data[3])
+	file.Header.MinorVersion = int(data[4])
+	file.Header.Unsynchronization = data[5]&1<<7 != 0
+	file.Header.Extended = data[5]&1<<6 != 0
+	file.Header.Experimental = data[5]&1<<5 != 0
+	file.Header.Footer = data[5]&1<<4 != 0
+	file.Header.Size = parseSize(data[6:])
 }
 
 // TODO: this is pretty inefficient but needed since Go handles extended ISO/IEC 8859-1 characters (>= 0x80)
