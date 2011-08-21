@@ -6,7 +6,6 @@ GOFILES=\
   id3v22.go\
   id3v23.go\
   id3v24.go\
-  mp3.go\
   mpeg.go\
 
 include $(GOROOT)/src/Make.pkg

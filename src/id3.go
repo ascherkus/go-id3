@@ -29,6 +29,18 @@ func init() {
 	skipBuffer = make([]byte, 1024*4)
 }
 
+type File struct {
+	ID3v2  *ID3v2Header
+	Name   string
+	Artist string
+	Album  string
+	Year   string
+	Track  string
+	Disc   string
+	Genre  string
+	Length string
+}
+
 type ID3v2Header struct {
 	version           int
 	minorVersion      int
@@ -42,6 +54,33 @@ type ID3v2Header struct {
 type ID3Parser interface {
 	HasFrame() bool
 	ReadFrame(file *File)
+}
+
+func Read(reader io.Reader) *File {
+	file := new(File)
+	bufReader := bufio.NewReader(reader)
+	if !isID3Tag(bufReader) {
+		return nil
+	}
+
+	file.ID3v2 = parseID3v2Header(bufReader)
+	limitReader := bufio.NewReader(io.LimitReader(bufReader, int64(file.ID3v2.size)))
+	var parser ID3Parser
+	if file.ID3v2.version == 2 {
+		parser = NewID3v22Parser(limitReader)
+	} else if file.ID3v2.version == 3 {
+		parser = NewID3v23Parser(limitReader)
+	} else if file.ID3v2.version == 4 {
+		parser = NewID3v24Parser(limitReader)
+	} else {
+		panic(fmt.Sprintf("Unrecognized ID3v2 version: %d", file.ID3v2.version))
+	}
+
+	for parser.HasFrame() {
+		parser.ReadFrame(file)
+	}
+
+	return file
 }
 
 func isID3Tag(reader *bufio.Reader) bool {
