@@ -1,3 +1,7 @@
 *.swp
+6.out
 _go_.*
+_gotest_.*
 _obj/
+_test/
+_testmain.*

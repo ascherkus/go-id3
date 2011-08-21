@@ -45,7 +45,10 @@ type ID3Parser interface {
 }
 
 func isID3Tag(reader *bufio.Reader) bool {
-	data, _ := reader.Peek(3)
+	data, err := reader.Peek(3)
+	if len(data) < 3 || err != nil {
+		return false
+	}
 	return data[0] == 'I' && data[1] == 'D' && data[2] == '3'
 }
 
