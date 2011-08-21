@@ -30,7 +30,8 @@ func init() {
 }
 
 type File struct {
-	ID3v2  *ID3v2Header
+	Header *ID3v2Header
+
 	Name   string
 	Artist string
 	Album  string
@@ -42,13 +43,13 @@ type File struct {
 }
 
 type ID3v2Header struct {
-	version           int
-	minorVersion      int
-	unsynchronization bool
-	extended          bool
-	experimental      bool
-	footer            bool
-	size              int32
+	Version           int
+	MinorVersion      int
+	Unsynchronization bool
+	Extended          bool
+	Experimental      bool
+	Footer            bool
+	Size              int32
 }
 
 type ID3Parser interface {
@@ -63,17 +64,17 @@ func Read(reader io.Reader) *File {
 		return nil
 	}
 
-	file.ID3v2 = parseID3v2Header(bufReader)
-	limitReader := bufio.NewReader(io.LimitReader(bufReader, int64(file.ID3v2.size)))
+	file.Header = parseID3v2Header(bufReader)
+	limitReader := bufio.NewReader(io.LimitReader(bufReader, int64(file.Header.Size)))
 	var parser ID3Parser
-	if file.ID3v2.version == 2 {
+	if file.Header.Version == 2 {
 		parser = NewID3v22Parser(limitReader)
-	} else if file.ID3v2.version == 3 {
+	} else if file.Header.Version == 3 {
 		parser = NewID3v23Parser(limitReader)
-	} else if file.ID3v2.version == 4 {
+	} else if file.Header.Version == 4 {
 		parser = NewID3v24Parser(limitReader)
 	} else {
-		panic(fmt.Sprintf("Unrecognized ID3v2 version: %d", file.ID3v2.version))
+		panic(fmt.Sprintf("Unrecognized ID3v2 version: %d", file.Header.Version))
 	}
 
 	for parser.HasFrame() {
@@ -95,13 +96,13 @@ func parseID3v2Header(reader io.Reader) *ID3v2Header {
 	data := make([]byte, 10)
 	reader.Read(data)
 	header := new(ID3v2Header)
-	header.version = int(data[3])
-	header.minorVersion = int(data[4])
-	header.unsynchronization = data[5]&1<<7 != 0
-	header.extended = data[5]&1<<6 != 0
-	header.experimental = data[5]&1<<5 != 0
-	header.footer = data[5]&1<<4 != 0
-	header.size = parseSize(data[6:])
+	header.Version = int(data[3])
+	header.MinorVersion = int(data[4])
+	header.Unsynchronization = data[5]&1<<7 != 0
+	header.Extended = data[5]&1<<6 != 0
+	header.Experimental = data[5]&1<<5 != 0
+	header.Footer = data[5]&1<<4 != 0
+	header.Size = parseSize(data[6:])
 	return header
 }
 
