@@ -36,7 +36,7 @@ type v24Frame struct {
 	dataLengthIndicator      bool
 }
 
-func NewID3v24Parser(reader *bufio.Reader) ID3Parser {
+func NewID3v24Parser(reader *bufio.Reader) id3Parser {
 	parser := new(v24Parser)
 	parser.reader = reader
 	return parser

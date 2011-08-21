@@ -43,7 +43,7 @@ type ID3v2Header struct {
 	Size              int32
 }
 
-type ID3Parser interface {
+type id3Parser interface {
 	HasFrame() bool
 	ReadFrame(file *File)
 }
@@ -57,7 +57,7 @@ func Read(reader io.Reader) *File {
 
 	parseID3v2Header(file, bufReader)
 	limitReader := bufio.NewReader(io.LimitReader(bufReader, int64(file.Header.Size)))
-	var parser ID3Parser
+	var parser id3Parser
 	if file.Header.Version == 2 {
 		parser = NewID3v22Parser(limitReader)
 	} else if file.Header.Version == 3 {
