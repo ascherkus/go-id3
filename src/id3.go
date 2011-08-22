@@ -12,6 +12,11 @@
 // See the License for the specific language governing permissions and
 // limitations under the License.
 
+// Package id3 implements basic ID3 parsing for MP3 files.
+//
+// Instead of providing access to every single ID3 frame this package
+// exposes only the ID3v2 header and a few basic fields such as the
+// artist, album, year, etc...
 package id3
 
 import (
@@ -20,6 +25,19 @@ import (
 	"io"
 )
 
+// A parsed ID3v2 header as defined in Section 3 of
+// http://id3.org/id3v2.4.0-structure
+type ID3v2Header struct {
+	Version           int
+	MinorVersion      int
+	Unsynchronization bool
+	Extended          bool
+	Experimental      bool
+	Footer            bool
+	Size              int32
+}
+
+// A parsed ID3 file with common fields exposed.
 type File struct {
 	Header ID3v2Header
 
@@ -33,21 +51,13 @@ type File struct {
 	Length string
 }
 
-type ID3v2Header struct {
-	Version           int
-	MinorVersion      int
-	Unsynchronization bool
-	Extended          bool
-	Experimental      bool
-	Footer            bool
-	Size              int32
-}
-
 type id3Parser interface {
 	HasFrame() bool
 	ReadFrame(file *File)
 }
 
+// Parse the input for ID3 information. Returns nil if parsing failed or the
+// input didn't contain ID3 information.
 func Read(reader io.Reader) *File {
 	file := new(File)
 	bufReader := bufio.NewReader(reader)
@@ -59,11 +69,11 @@ func Read(reader io.Reader) *File {
 	limitReader := bufio.NewReader(io.LimitReader(bufReader, int64(file.Header.Size)))
 	var parser id3Parser
 	if file.Header.Version == 2 {
-		parser = NewID3v22Parser(limitReader)
+		parser = newID3v22Parser(limitReader)
 	} else if file.Header.Version == 3 {
-		parser = NewID3v23Parser(limitReader)
+		parser = newID3v23Parser(limitReader)
 	} else if file.Header.Version == 4 {
-		parser = NewID3v24Parser(limitReader)
+		parser = newID3v24Parser(limitReader)
 	} else {
 		panic(fmt.Sprintf("Unrecognized ID3v2 version: %d", file.Header.Version))
 	}

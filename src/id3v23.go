@@ -30,7 +30,7 @@ type v23Frame struct {
 	flags uint16
 }
 
-func NewID3v23Parser(reader *bufio.Reader) id3Parser {
+func newID3v23Parser(reader *bufio.Reader) id3Parser {
 	parser := new(v23Parser)
 	parser.reader = reader
 	return parser

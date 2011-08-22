@@ -28,7 +28,7 @@ type v22Frame struct {
 	size int32
 }
 
-func NewID3v22Parser(reader *bufio.Reader) id3Parser {
+func newID3v22Parser(reader *bufio.Reader) id3Parser {
 	parser := new(v22Parser)
 	parser.reader = reader
 	return parser

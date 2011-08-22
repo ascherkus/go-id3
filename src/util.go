@@ -24,7 +24,6 @@ import (
 
 var skipBuffer []byte = make([]byte, 1024*4)
 
-
 // TODO: this is pretty inefficient but needed since Go handles extended ISO/IEC 8859-1 characters (>= 0x80)
 // differently depending on whether you call string() with a []byte or an []int.
 func expand(data []byte) []int {
@@ -66,6 +65,8 @@ func toUTF16(data []byte) []uint16 {
 }
 
 // Sizes are stored big endian but with the first bit set to 0 and always ignored.
+//
+// Refer to section 3.1 of http://id3.org/id3v2.4.0-structure
 func parseSize(data []byte) int32 {
 	size := int32(0)
 	for i, b := range data {
@@ -79,6 +80,13 @@ func parseSize(data []byte) int32 {
 	return size
 }
 
+// Parses a string from frame data. The first byte represents the encoding:
+//   0x01  ISO-8859-1
+//   0x02  UTF-16 w/ BOM
+//   0x03  UTF-16BE w/o BOM
+//   0x04  UTF-8
+//
+// Refer to section 4 of http://id3.org/id3v2.4.0-structure
 func parseString(data []byte) string {
 	var s string
 	switch data[0] {
