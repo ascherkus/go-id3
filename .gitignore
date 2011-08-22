@@ -5,3 +5,4 @@ _gotest_.*
 _obj/
 _test/
 _testmain.*
+examples/tagreader

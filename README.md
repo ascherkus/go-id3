@@ -27,3 +27,12 @@ Pass in a suitable io.Reader and away you go!
 
 Currently go-id3 will panic if it encounters a frame it does not know about.
 This is temporary while I try to fix some bugs.
+
+
+Examples
+--------
+An example tag reading program can be found in the examples directory.
+
+    cd examples
+    gomake
+    ./tagreader path/to/file.mp3 [...]
