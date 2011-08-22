@@ -31,7 +31,8 @@ This is temporary while I try to fix some bugs.
 
 Examples
 --------
-An example tag reading program can be found in the examples directory.
+An example tag reading program can be found in the examples directory. The
+id3 package must be installed before building any examples.
 
     cd examples
     gomake
