@@ -25,5 +25,5 @@ Pass in a suitable io.Reader and away you go!
             fmt.Println(file)
     }
 
-Currently id3-go will panic if it encounters a frame it does not know about.
+Currently go-id3 will panic if it encounters a frame it does not know about.
 This is temporary while I try to fix some bugs.
