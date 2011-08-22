@@ -71,7 +71,7 @@ func (parser *v22Parser) ReadFrame(file *File) {
 	case "TPA":
 		file.Disc = readString(parser.reader, int(frame.size))
 	case "TCO":
-		file.Genre = readString(parser.reader, int(frame.size))
+		file.Genre = readGenre(parser.reader, int(frame.size))
 
 	// Skip these frame types.
 	case "CM1": // ???

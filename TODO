@@ -19,7 +19,6 @@ ID3 v1
 
 ID3 v2.2
 --------
-  - ID3v1 genres
   - Length
   - CM1 frame
   - IPP frame
@@ -32,7 +31,6 @@ ID3 v2.2
 
 ID3 v2.3 support
 --------
-  - ID3v1 genres
   - NCON frame
   - TCMP frame
   - TDEN frame
@@ -44,7 +42,6 @@ ID3 v2.3 support
 
 ID3 v2.4
 --------
-  - ID3v1 genres
   - TCMP frame
   - Merge with v2.3 code?
 

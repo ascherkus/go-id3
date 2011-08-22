@@ -68,8 +68,7 @@ func (parser *v23Parser) ReadFrame(file *File) {
 	case "TPE1":
 		file.Artist = readString(parser.reader, int(frame.size))
 	case "TCON":
-		// TODO: handle ID3v1 numerical genres.
-		file.Genre = readString(parser.reader, int(frame.size))
+		file.Genre = readGenre(parser.reader, int(frame.size))
 	case "TIT2":
 		file.Name = readString(parser.reader, int(frame.size))
 	case "TYER":

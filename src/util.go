@@ -125,6 +125,11 @@ func readString(reader *bufio.Reader, c int) string {
 	return parseString(readBytes(reader, c))
 }
 
+func readGenre(reader *bufio.Reader, c int) string {
+	genre := parseString(readBytes(reader, c))
+	return convertID3v1Genre(genre)
+}
+
 func skipBytes(reader *bufio.Reader, c int) {
 	pos := 0
 	for pos < c {

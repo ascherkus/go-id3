@@ -28,7 +28,7 @@ type fileTest struct {
 
 var fileTests = []fileTest{
 	fileTest{"test_220.mp3", File{ID3v2Header{2, 0, false, false, false, false, 226741},
-		"There There", "Radiohead", "Hail To The Thief", "2003", "9", "", "(20)", ""}},
+		"There There", "Radiohead", "Hail To The Thief", "2003", "9", "", "Alternative", ""}},
 	fileTest{"test_230.mp3", File{ID3v2Header{3, 0, false, false, false, false, 150717},
 		"Everything In Its Right Place", "Radiohead", "Kid A", "2000", "1", "", "Alternative", ""}},
 	fileTest{"test_240.mp3", File{ID3v2Header{4, 0, false, false, false, false, 165126},
