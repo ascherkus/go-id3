@@ -96,6 +96,8 @@ func (parser *v22Parser) ReadFrame(file *File) {
 		fallthrough
 	case "TP2": // Band/Orchestra/Accompaniment
 		fallthrough
+	case "TSS": // Software/hardware and settings used for encoding
+		fallthrough
 	case "TT1": // Content group description
 		fallthrough
 	case "UFI": // Unique file identifier
