@@ -44,7 +44,7 @@ func TestEmpty(t *testing.T) {
 
 func TestFiles(t *testing.T) {
 	for _, expected := range fileTests {
-		p := path.Join("test", expected.path)
+		p := path.Join("..", "..", "test", expected.path)
 		t.Log(p)
 
 		fd, err := os.Open(p)
