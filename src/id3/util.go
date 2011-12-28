@@ -64,6 +64,21 @@ func toUTF16(data []byte) []uint16 {
 	return s
 }
 
+// Peeks at the buffer to see if there is a valid frame.
+func hasFrame(reader *bufio.Reader, frameSize int) bool {
+	data, err := reader.Peek(frameSize)
+	if err != nil {
+		return false
+	}
+
+	for _, c := range data {
+		if (c < 'A' || c > 'Z') && (c < '0' || c > '9') {
+			return false
+		}
+	}
+	return true
+}
+
 // Sizes are stored big endian but with the first bit set to 0 and always ignored.
 //
 // Refer to section 3.1 of http://id3.org/id3v2.4.0-structure

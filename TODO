@@ -1,50 +1,10 @@
-TODO
-====
-I've listed a bunch of ID3 frames that weren't listed as part of the spec. I'm
-pretty sure we can ignore them but hey might as well list them here for
-completeness.
-
-
 General
 -------
+  - ID3 v1 support
   - ID3 v2.x code can be deduplicated
   - ID3 (un)synchronization handling
+  - ID3 v2.4 timestamp parsing
   - Pictures!
-
-
-ID3 v1
-------
-  - Everything
-
-
-ID3 v2.2
---------
-  - Length
-  - CM1 frame
-  - IPP frame
-  - PCS frame
-  - TCT frame
-  - TDR frame
-  - TID frame
-  - WFD frame
-
-
-ID3 v2.3 support
---------
-  - NCON frame
-  - TCMP frame
-  - TDEN frame
-  - TDTG frame
-  - RGAD frame
-  - XSOP frame
-  - Merge with v2.4 code?
-
-
-ID3 v2.4
---------
-  - TCMP frame
-  - Merge with v2.3 code?
-
 
 Unicode support
 ---------------

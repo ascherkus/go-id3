@@ -51,11 +51,6 @@ type File struct {
 	Length string
 }
 
-type id3Parser interface {
-	HasFrame() bool
-	ReadFrame(file *File)
-}
-
 // Parse the input for ID3 information. Returns nil if parsing failed or the
 // input didn't contain ID3 information.
 func Read(reader io.Reader) *File {
@@ -65,21 +60,16 @@ func Read(reader io.Reader) *File {
 		return nil
 	}
 
-	parseID3v2Header(file, bufReader)
+	parseID3v2Header(bufReader, file)
 	limitReader := bufio.NewReader(io.LimitReader(bufReader, int64(file.Header.Size)))
-	var parser id3Parser
 	if file.Header.Version == 2 {
-		parser = newID3v22Parser(limitReader)
+		parseID3v22File(limitReader, file)
 	} else if file.Header.Version == 3 {
-		parser = newID3v23Parser(limitReader)
+		parseID3v23File(limitReader, file)
 	} else if file.Header.Version == 4 {
-		parser = newID3v24Parser(limitReader)
+		parseID3v24File(limitReader, file)
 	} else {
 		panic(fmt.Sprintf("Unrecognized ID3v2 version: %d", file.Header.Version))
-	}
-
-	for parser.HasFrame() {
-		parser.ReadFrame(file)
 	}
 
 	return file
@@ -93,9 +83,8 @@ func isID3Tag(reader *bufio.Reader) bool {
 	return data[0] == 'I' && data[1] == 'D' && data[2] == '3'
 }
 
-func parseID3v2Header(file *File, reader io.Reader) {
-	data := make([]byte, 10)
-	reader.Read(data)
+func parseID3v2Header(reader *bufio.Reader, file *File) {
+	data := readBytes(reader, 10)
 	file.Header.Version = int(data[3])
 	file.Header.MinorVersion = int(data[4])
 	file.Header.Unsynchronization = data[5]&1<<7 != 0

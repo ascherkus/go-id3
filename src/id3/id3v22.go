@@ -16,98 +16,36 @@ package id3
 
 import (
 	"bufio"
-	"fmt"
 )
 
-type v22Parser struct {
-	reader *bufio.Reader
+// ID3 v2.2 uses 24-bit big endian frame sizes.
+func parseID3v22FrameSize(reader *bufio.Reader) int {
+	size := readBytes(reader, 3)
+	return int(size[0])<<16 | int(size[1])<<8 | int(size[2])
 }
 
-type v22Frame struct {
-	id   string
-	size int32
-}
+func parseID3v22File(reader *bufio.Reader, file *File) {
+	for hasFrame(reader, 3) {
+		id := string(readBytes(reader, 3))
+		size := parseID3v22FrameSize(reader)
 
-func newID3v22Parser(reader *bufio.Reader) id3Parser {
-	parser := new(v22Parser)
-	parser.reader = reader
-	return parser
-}
-
-func (parser *v22Parser) HasFrame() bool {
-	data, err := parser.reader.Peek(3)
-	if err != nil {
-		return false
-	}
-
-	for _, c := range data {
-		if (c < 'A' || c > 'Z') && (c < '0' || c > '9') {
-			return false
+		switch id {
+		case "TAL":
+			file.Album = readString(reader, size)
+		case "TRK":
+			file.Track = readString(reader, size)
+		case "TP1":
+			file.Artist = readString(reader, size)
+		case "TT2":
+			file.Name = readString(reader, size)
+		case "TYE":
+			file.Year = readString(reader, size)
+		case "TPA":
+			file.Disc = readString(reader, size)
+		case "TCO":
+			file.Genre = readGenre(reader, size)
+		default:
+			skipBytes(reader, size)
 		}
-	}
-	return true
-}
-
-func (parser *v22Parser) ReadFrame(file *File) {
-	frame := new(v22Frame)
-
-	id := readBytes(parser.reader, 3)
-	frame.id = string(id)
-
-	size := readBytes(parser.reader, 3)
-	frame.size = int32(size[0])<<16 | int32(size[1])<<8 | int32(size[2])
-
-	switch frame.id {
-	case "TAL":
-		file.Album = readString(parser.reader, int(frame.size))
-	case "TRK":
-		file.Track = readString(parser.reader, int(frame.size))
-	case "TP1":
-		file.Artist = readString(parser.reader, int(frame.size))
-	case "TT2":
-		file.Name = readString(parser.reader, int(frame.size))
-	case "TYE":
-		file.Year = readString(parser.reader, int(frame.size))
-	case "TPA":
-		file.Disc = readString(parser.reader, int(frame.size))
-	case "TCO":
-		file.Genre = readGenre(parser.reader, int(frame.size))
-
-	// Skip these frame types.
-	case "CM1": // ???
-		fallthrough
-	case "COM": // Comment
-		fallthrough
-	case "IPP": // ???
-		fallthrough
-	case "PCS": // ???
-		fallthrough
-	case "PIC": // Picture
-		fallthrough
-	case "TCM": // Composer
-		fallthrough
-	case "TCT": // ???
-		fallthrough
-	case "TDR": // ???
-		fallthrough
-	case "TEN": // Encoded by
-		fallthrough
-	case "TID": // ???
-		fallthrough
-	case "TP2": // Band/Orchestra/Accompaniment
-		fallthrough
-	case "TSS": // Software/hardware and settings used for encoding
-		fallthrough
-	case "TT1": // Content group description
-		fallthrough
-	case "UFI": // Unique file identifier
-		fallthrough
-	case "ULT": // Unsychronized lyrics/text transcription
-		fallthrough
-	case "WFD": // ???
-		skipBytes(parser.reader, int(frame.size))
-		break
-	default:
-		panic(fmt.Sprintf("Unrecognized frame ID: %s, size=%d\n", frame.id, frame.size))
 	}
 }

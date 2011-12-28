@@ -17,148 +17,42 @@ package id3
 import (
 	"encoding/binary"
 	"bufio"
-	"fmt"
 )
 
-type v23Parser struct {
-	reader *bufio.Reader
+// ID3 v2.3 doesn't use sync-safe frame sizes: read in as a regular big endian number.
+func parseID3v23Size(reader *bufio.Reader) int {
+	var size int32
+	binary.Read(reader, binary.BigEndian, &size)
+	return int(size)
 }
 
-type v23Frame struct {
-	id    string
-	size  int32
-	flags uint16
-}
+func parseID3v23File(reader *bufio.Reader, file *File) {
+	for hasFrame(reader, 4) {
+		id := string(readBytes(reader, 4))
+		size := parseID3v23Size(reader)
 
-func newID3v23Parser(reader *bufio.Reader) id3Parser {
-	parser := new(v23Parser)
-	parser.reader = reader
-	return parser
-}
+		// Skip over frame flags.
+		skipBytes(reader, 2)
 
-func (parser *v23Parser) HasFrame() bool {
-	data, err := parser.reader.Peek(4)
-	if err != nil {
-		return false
-	}
-
-	for _, c := range data {
-		if (c < 'A' || c > 'Z') && (c < '0' || c > '9') {
-			return false
+		switch id {
+		case "TALB":
+			file.Album = readString(reader, size)
+		case "TRCK":
+			file.Track = readString(reader, size)
+		case "TPE1":
+			file.Artist = readString(reader, size)
+		case "TCON":
+			file.Genre = readGenre(reader, size)
+		case "TIT2":
+			file.Name = readString(reader, size)
+		case "TYER":
+			file.Year = readString(reader, size)
+		case "TPOS":
+			file.Disc = readString(reader, size)
+		case "TLEN":
+			file.Length = readString(reader, size)
+		default:
+			skipBytes(reader, size)
 		}
-	}
-	return true
-}
-
-func (parser *v23Parser) ReadFrame(file *File) {
-	frame := new(v23Frame)
-
-	id := readBytes(parser.reader, 4)
-	frame.id = string(id)
-
-	// ID3 v2.3 doesn't use sync-safe frame sizes.
-	binary.Read(parser.reader, binary.BigEndian, &frame.size)
-	binary.Read(parser.reader, binary.BigEndian, &frame.flags)
-
-	switch frame.id {
-	case "TALB":
-		file.Album = readString(parser.reader, int(frame.size))
-	case "TRCK":
-		file.Track = readString(parser.reader, int(frame.size))
-	case "TPE1":
-		file.Artist = readString(parser.reader, int(frame.size))
-	case "TCON":
-		file.Genre = readGenre(parser.reader, int(frame.size))
-	case "TIT2":
-		file.Name = readString(parser.reader, int(frame.size))
-	case "TYER":
-		file.Year = readString(parser.reader, int(frame.size))
-	case "TPOS":
-		file.Disc = readString(parser.reader, int(frame.size))
-	case "TLEN":
-		file.Length = readString(parser.reader, int(frame.size))
-
-	// Skip these frame types.
-	case "APIC": // Picture
-		fallthrough
-	case "COMM": // Comment
-		fallthrough
-	case "GEOB": // General encapsulated object
-		fallthrough
-	case "PRIV": // Private
-		fallthrough
-	case "MCDI": // Music CD identifier
-		fallthrough
-	case "NCON": // ???
-		fallthrough
-	case "POPM": // Popularimeter
-		fallthrough
-	case "RGAD": // ???
-		fallthrough
-	case "RVAD": // Relative volume adjustment
-		fallthrough
-	case "SYLT": // Synchronized lyrics/text transcription
-		fallthrough
-	case "TBPM": // Beats per minute
-		fallthrough
-	case "TCMP": // ???
-		fallthrough
-	case "TCOM": // Composer
-		fallthrough
-	case "TCOP": // Copyright message
-		fallthrough
-	case "TDAT": // Date of recording (DDMM)
-		fallthrough
-	case "TDEN": // ???
-		fallthrough
-	case "TDTG": // ???
-		fallthrough
-	case "TENC": // Encoded by
-		fallthrough
-	case "TFLT": // File type
-		fallthrough
-	case "TIT1": // Content group description
-		fallthrough
-	case "TIT3": // Subtitle/Description refinement
-		fallthrough
-	case "TLAN": // Language
-		fallthrough
-	case "TMED": // Media type
-		fallthrough
-	case "TOPE": // Original artist
-		fallthrough
-	case "TORY": // Original release year
-		fallthrough
-	case "TPE2": // Band/Orchestra/Accompaniment
-		fallthrough
-	case "TPE3": // Conductor
-		fallthrough
-	case "TPUB": // Publisher
-		fallthrough
-	case "TSIZ": // Size
-		fallthrough
-	case "TSRC": // International recording code
-		fallthrough
-	case "TSSE": // Software/Hardware encoder settings
-		fallthrough
-	case "TXXX": // User defined text
-		fallthrough
-	case "USER": // Terms of use
-		fallthrough
-	case "UFID": // Unique file identifier
-		fallthrough
-	case "USLT": // Unsynchronized lyrics/text transcription
-		fallthrough
-	case "XSOP": // ???
-		fallthrough
-	case "WCOM": // Commercial information
-		fallthrough
-	case "WOAF": // Official audio file webpage
-		fallthrough
-	case "WXXX": // User defined URL
-		skipBytes(parser.reader, int(frame.size))
-		break
-	default:
-		panic(fmt.Sprintf("Unrecognized frame ID: %s, size=%d\n", frame.id, frame.size))
 	}
 }
