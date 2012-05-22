@@ -2,7 +2,7 @@ ID3 Parsing For Go
 ==================
 
 Andrew Scherkus
-August 17, 2011
+May 21, 2012
 
 
 Introduction
@@ -25,15 +25,10 @@ Pass in a suitable io.Reader and away you go!
             fmt.Println(file)
     }
 
-Currently go-id3 will panic if it encounters a frame it does not know about.
-This is temporary while I try to fix some bugs.
-
 
 Examples
 --------
-An example tag reading program can be found in the examples directory. The
-id3 package must be installed before building any examples.
+An example tag reading program can be found under id3/tagreader.
 
-    cd examples
-    gomake
-    ./tagreader path/to/file.mp3 [...]
+    go install id3/tagreader
+    $GOPATH/bin/tagreader path/to/file.mp3 [...]

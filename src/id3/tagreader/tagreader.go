@@ -29,22 +29,25 @@ func main() {
 	for _, s := range os.Args[1:] {
 		var fd, err = os.Open(s)
 		if err != nil {
-			fmt.Println(err.String())
+			fmt.Fprintf(os.Stderr, "Could not open %s: %s\n", s, err)
 			return
 		}
-		defer fd.Close()
-
-		fmt.Println(s)
 		file := id3.Read(fd)
-		fmt.Printf("Header\t%s\n", file.Header)
-		fmt.Printf("Name\t%s\n", file.Name)
-		fmt.Printf("Artist\t%s\n", file.Artist)
-		fmt.Printf("Album\t%s\n", file.Album)
-		fmt.Printf("Year\t%s\n", file.Year)
-		fmt.Printf("Track\t%s\n", file.Track)
-		fmt.Printf("Disc\t%s\n", file.Disc)
-		fmt.Printf("Genre\t%s\n", file.Genre)
-		fmt.Printf("Length\t%s\n", file.Length)
-		fmt.Println()
+		if file == nil {
+			fmt.Fprintf(os.Stderr, "Could not read ID3 information from %s\n", s)
+		} else {
+			fmt.Println(s)
+			fmt.Printf("Header\t%s\n", file.Header)
+			fmt.Printf("Name\t%s\n", file.Name)
+			fmt.Printf("Artist\t%s\n", file.Artist)
+			fmt.Printf("Album\t%s\n", file.Album)
+			fmt.Printf("Year\t%s\n", file.Year)
+			fmt.Printf("Track\t%s\n", file.Track)
+			fmt.Printf("Disc\t%s\n", file.Disc)
+			fmt.Printf("Genre\t%s\n", file.Genre)
+			fmt.Printf("Length\t%s\n", file.Length)
+			fmt.Println()
+		}
+		fd.Close()
 	}
 }

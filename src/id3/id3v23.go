@@ -15,8 +15,8 @@
 package id3
 
 import (
-	"encoding/binary"
 	"bufio"
+	"encoding/binary"
 )
 
 // ID3 v2.3 doesn't use sync-safe frame sizes: read in as a regular big endian number.

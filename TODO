@@ -11,4 +11,3 @@ Unicode support
   - UTF-16BE needs to be tested
   - Variable length UTF-16 strings are probably handled incorrectly
   - UTF-16 w/o BOM needs to be tested
-  - expand() in id3.go is pretty silly due to how Go handles ISO/IEC 8859-1 characters

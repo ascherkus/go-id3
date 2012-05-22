@@ -15,9 +15,9 @@
 package id3
 
 import (
-	"strings"
 	"fmt"
 	"strconv"
+	"strings"
 )
 
 var id3v1Genres = []string{

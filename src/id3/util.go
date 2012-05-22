@@ -17,21 +17,18 @@ package id3
 import (
 	"bufio"
 	"fmt"
-	"utf8"
-	"utf16"
 	"strings"
+	"unicode/utf16"
 )
 
 var skipBuffer []byte = make([]byte, 1024*4)
 
-// TODO: this is pretty inefficient but needed since Go handles extended ISO/IEC 8859-1 characters (>= 0x80)
-// differently depending on whether you call string() with a []byte or an []int.
-func expand(data []byte) []int {
-	p := make([]int, len(data))
+func ISO8859_1ToUTF8(data []byte) string {
+	p := make([]rune, len(data))
 	for i, b := range data {
-		p[i] = int(b)
+		p[i] = rune(b)
 	}
-	return p
+	return string(p)
 }
 
 func toUTF16(data []byte) []uint16 {
@@ -106,7 +103,7 @@ func parseString(data []byte) string {
 	var s string
 	switch data[0] {
 	case 0: // ISO-8859-1 text.
-		s = string(expand(data[1:]))
+		s = ISO8859_1ToUTF8(data[1:])
 		break
 	case 1: // UTF-16 with BOM.
 		s = string(utf16.Decode(toUTF16(data[1:])))
@@ -114,11 +111,11 @@ func parseString(data []byte) string {
 	case 2: // UTF-16BE without BOM.
 		panic("Unsupported text encoding UTF-16BE.")
 	case 3: // UTF-8 text.
-		s = utf8.NewString(string(data[1:])).String()
+		s = string(data[1:])
 		break
 	default:
 		// No encoding, assume ISO-8859-1 text.
-		s = string(expand(data))
+		s = ISO8859_1ToUTF8(data)
 	}
 	return strings.TrimRight(s, "\u0000")
 }
